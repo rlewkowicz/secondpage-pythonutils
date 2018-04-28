@@ -6,12 +6,18 @@ import json
 import pika
 import urllib.parse
 
+from metadata_parser import MetadataParser
+import pdb
+import pprint
+import warnings
+from bs4 import BeautifulSoup
+warnings.filterwarnings("ignore")
+
 
 def get(url):
-    # r  = requests.get("http://localhost:3000/render/"+urllib.parse.quote_plus(url))
-    article = Article("http://localhost:3000/render/"+urllib.parse.quote_plus(url))
-    article.download()
-    print(article.top_image)
+    r  = requests.get("http://localhost:3000/render/"+urllib.parse.quote_plus(url))
+    a = MetadataParser(html=r.text)
+    print(a.get_metadata('image'))
 
 while True:
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
