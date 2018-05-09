@@ -1,0 +1,25 @@
+2018-05-07 10:00:54,395 INFO daemonizing the supervisord process
+2018-05-07 10:00:54,396 INFO supervisord started with pid 18149
+2018-05-07 10:00:55,399 INFO spawned: 'supervisord' with pid 18188
+2018-05-07 10:00:57,265 INFO success: supervisord entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-05-07 12:36:10,382 INFO exited: supervisord (exit status 99; not expected)
+2018-05-07 12:36:11,384 INFO spawned: 'supervisord' with pid 19525
+2018-05-07 12:36:13,310 INFO success: supervisord entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-05-07 12:42:14,231 INFO exited: supervisord (exit status 99; not expected)
+2018-05-07 12:42:15,234 INFO spawned: 'supervisord' with pid 23013
+2018-05-07 12:42:16,991 INFO success: supervisord entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-05-07 12:54:00,977 INFO exited: supervisord (exit status 99; not expected)
+2018-05-07 12:54:01,979 INFO spawned: 'supervisord' with pid 27201
+2018-05-07 12:54:03,758 INFO success: supervisord entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-05-07 13:14:09,921 INFO exited: supervisord (exit status 99; not expected)
+2018-05-07 13:14:10,923 INFO spawned: 'supervisord' with pid 32605
+2018-05-07 13:14:12,628 INFO success: supervisord entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-05-07 14:29:24,076 INFO exited: supervisord (exit status 99; not expected)
+2018-05-07 14:29:38,235 INFO spawned: 'supervisord' with pid 17245
+2018-05-07 14:29:39,273 INFO success: supervisord entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-05-07 14:29:50,017 INFO exited: supervisord (exit status 99; not expected)
+2018-05-07 14:29:51,020 INFO spawned: 'supervisord' with pid 17829
+2018-05-07 14:29:52,753 INFO success: supervisord entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2018-05-07 19:02:13,249 WARN received SIGTERM indicating exit request
+2018-05-07 19:02:13,249 INFO waiting for supervisord to die
+2018-05-07 19:02:13,294 INFO stopped: supervisord (terminated by SIGTERM)
