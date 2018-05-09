@@ -29,7 +29,7 @@ def main():
 
     log.info("creating keyspace...")
     session.execute("""
-        CREATE KEYSPACE %s
+        CREATE KEYSPACE IF NOT EXISTS %s
         WITH replication = { 'class': 'SimpleStrategy', 'replication_factor': '1' }
         """ % KEYSPACE)
 
@@ -38,7 +38,7 @@ def main():
 
     log.info("creating table...")
     session.execute("""
-        CREATE TABLE blob (
+        CREATE TABLE IF NOT EXISTS blob (
             object_id text,
             chunk_count int,
             size int,
@@ -49,7 +49,7 @@ def main():
         )
         """)
     session.execute("""
-        CREATE TABLE blob_chunk (
+        CREATE TABLE IF NOT EXISTS blob_chunk (
             object_id text,
             chunk_id int,
             chunk_size int,
@@ -60,7 +60,7 @@ def main():
 
 
     session.execute("""
-        CREATE INDEX ON blob_chunk(chunk_id);
+        CREATE INDEX IF NOT EXISTS ON blob_chunk(chunk_id);
         """)
 
 

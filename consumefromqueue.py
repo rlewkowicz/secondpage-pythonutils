@@ -1,30 +1,41 @@
-from newspaper import fulltext
-from newspaper import Article
-import base64
-import requests
-import json
-import pika
-import urllib.parse
+import multiprocessing
+import damn
+import initcass
+import get
+    # f = open("cass.jpg","w+")
+    # f.write("")
+    # f.close()
+    # f = open("cass.jpg","ab")
+    #
+    # for i in range(1, image.chunk_count+1):
+    #     data = None
+    #     while not data:
+    #         try:
+    #             data = session.execute("select * from blob_chunk where chunk_id="+str(i)+" AND object_id='"+str(thing['objectid'])+"'")[0]
+    #             f.write(data.data)
+    #         except:
+    #             pass
+    #
+    # f.close()
 
-from metadata_parser import MetadataParser
-import pdb
-import pprint
-import warnings
-from bs4 import BeautifulSoup
-warnings.filterwarnings("ignore")
+def get_init(q):
+    get.articlequeue = q
+
+initcass.initarticle('127.0.0.1', "yourmom")
+articlequeue=multiprocessing.Queue(maxsize=5)
+pool = multiprocessing.Pool(initializer=get_init, initargs=[articlequeue])
 
 
-def get(url):
-    r  = requests.get("http://localhost:3000/render/"+urllib.parse.quote_plus(url))
-    a = MetadataParser(html=r.text)
-    print(a.get_metadata('image'))
 
-while True:
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    channel = connection.channel()
-    method_frame, header_frame, body = channel.basic_get('articles')
-    if method_frame:
-        get(json.loads(body.decode('utf-8'))["link"])
-        channel.basic_ack(method_frame.delivery_tag)
-    else:
-        print('No message returned')
+def main():
+    # get.get('127.0.0.1', 'yourmom')
+    while True:
+        if not articlequeue.full():
+            articlequeue.put_nowait(1)
+            pool.apply_async(get.get,  kwds={'ip':'127.0.0.1', 'keyspace':'yourmom'})
+if __name__ == "__main__":
+    main()
+#
+# while True:
+#     if not articlequeue.full():
+#         articlequeue.put(1)
