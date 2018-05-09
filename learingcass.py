@@ -96,7 +96,7 @@ def main():
     while chunk: #loop until the chunk is empty (the file is exhausted)
         log.info("inserting row %d" % count)
         sha1.update(chunk)
-        print(len(chunk)," postion", count)
+        
         session.execute(blob_chunk, dict(object_id=str(hashId), chunk_id=count, chunk_size=len(chunk), data=chunk))
         # session.execute(prepared.bind(("key%d" % i, 'b', 'b')))
         chunk = f.read(CHUNK_SIZE) #read the next chunk
@@ -118,8 +118,8 @@ def main():
 
     f.close()
 
-    print("SHA1: {0}".format(sha1.hexdigest()))
-    print("SHA1: {0}".format(hashId.hexdigest()))
+    
+    
 
     # session.execute("DROP KEYSPACE " + KEYSPACE)
 

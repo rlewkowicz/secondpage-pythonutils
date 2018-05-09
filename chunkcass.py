@@ -33,7 +33,7 @@ def initimage(session):
     """)
 
 def chunkandinsertimage(session, filepath, imgurl, imgname, chunksize = 2**16, threads = 2):
-    print("start of chunk")
+
     blob_chunk = SimpleStatement("""
     INSERT INTO blob_chunk (object_id, chunk_id, chunk_size, data)
     VALUES (%(object_id)s, %(chunk_id)s, %(chunk_size)s, %(data)s)
@@ -52,24 +52,25 @@ def chunkandinsertimage(session, filepath, imgurl, imgname, chunksize = 2**16, t
         while len(chunk) != 0:
             hashid.update(chunk)
             chunk = source.read(chunksize)
-    print("posthash")
+
     count = 0
     totalsize = 0
     checksum = hashlib.sha1()
-    print(filepath)
+
     with open(filepath, 'rb') as source:
-        print("in open seq")
+
         chunk = source.read(chunksize)
         while len(chunk) != 0:
             totalsize += len(chunk)
             checksum.update(chunk)
             count += 1
-            print("session execute")
+
             session.execute(blob_chunk, dict(object_id=str(hashid.hexdigest()), chunk_id=count, chunk_size=len(chunk), data=chunk))
-            print("post session execute")
+
             chunk = source.read(chunksize)
         if hashid.hexdigest() != checksum.hexdigest():
-            print('The final object checksum for the chunked object does not match the original hash')
+            raise ValueError('The final object checksum for the chunked object does not match the original hash')
+            
     session.execute(image, dict(object_id=hashid.hexdigest(), chunk_count=count, size=totalsize, name=imgname, checksum=hashid.hexdigest(), image_url=imgurl, metadata="null"))
 
     thing = {}

@@ -20,15 +20,14 @@ def initarticle(ip, keyspace):
 
     session.execute("""
         CREATE TABLE IF NOT EXISTS article (
-            object_id text,
-            chunk_count int,
-            size int,
+            url text,
             title text,
             publication text,
-            chunk_size int,
-            checksum text,
+            summary text,
+            articletext text,
+            html text,
             assets text,
-            PRIMARY KEY (object_id)
+            PRIMARY KEY (url)
         )
         """)
 

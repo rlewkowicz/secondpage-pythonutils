@@ -23,8 +23,8 @@ for key in categories:
         articles=pub["items"]
         for article in articles:
             article['publication'] = key
-            # print(key)
-            # print(article)
+            # 
+            # 
             channel.basic_publish(exchange='',
                       routing_key='articles',
                       body=json.dumps(article))

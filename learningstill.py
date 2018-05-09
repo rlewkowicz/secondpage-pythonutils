@@ -95,7 +95,7 @@ VALUES (%(object_id)s, %(chunk_count)s, %(size)s, %(chunk_size)s, %(checksum)s, 
 
 
 def get(url):
-    print(url)
+    
     r  = requests.get("http://localhost:3000/render/"+urllib.parse.quote_plus(json.loads(url.decode('utf-8'))["link"]))
     a = MetadataParser(html=r.text)
     imgurl = str(a.get_metadata('image'))
@@ -103,7 +103,7 @@ def get(url):
     publication = json.loads(url.decode('utf-8'))["publication"]
     title = json.loads(url.decode('utf-8'))["title"]
     articleurl = json.loads(url.decode('utf-8'))["link"]
-    print(publication, title, articleurl, imgname)
+    
     get = None
     try:
         get = urllib.request.urlretrieve(imgurl, imgname)
@@ -118,8 +118,8 @@ def get(url):
             get = urllib.request.urlretrieve(imgurl, imgname)
         except:
             pass
-    print(publication, title, articleurl, imgname)
-    print(imgname)
+    
+    
 
 
     chunkcass.initblobchunk()
@@ -146,7 +146,7 @@ def get(url):
     # while chunk: #loop until the chunk is empty (the file is exhausted)
     #     # log.info("inserting row %d" % count)
     #     sha1.update(chunk)
-    #     # print(len(chunk)," postion", count)
+    #     # 
     #     session.execute(blob_chunk, dict(object_id=str(hashId), chunk_id=count, chunk_size=len(chunk), data=chunk))
     #     # session.execute(prepared.bind(("key%d" % i, 'b', 'b')))
     #     chunk = f.read(CHUNK_SIZE) #read the next chunk
@@ -173,8 +173,8 @@ def get(url):
     #
     # f.close()
     #
-    # print("SHA1: {0}".format(sha1.hexdigest()))
-    # print("SHA1: {0}".format(hashId.hexdigest()))
+    # 
+    # 
 
     # session.execute("DROP KEYSPACE " + KEYSPACE)
 
@@ -188,4 +188,4 @@ while True:
         get(body)
         channel.basic_ack(method_frame.delivery_tag)
     else:
-        print('No message returned')
+        

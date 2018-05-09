@@ -13,6 +13,8 @@ import multiprocessing
 import sys
 import logging
 import hashlib
+import uuid
+
 
 from metadata_parser import MetadataParser
 import pdb
@@ -42,23 +44,27 @@ def get(ip, keyspace):
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
     channel.queue_declare(queue='articles')
-
     article = SimpleStatement("""
-    INSERT INTO article (object_id, chunk_count, size, chunk_size, assets, title, publication)
-    VALUES (%(object_id)s, %(chunk_count)s, %(size)s, %(chunk_size)s, %(assets)s, %(title)s, %(publication)s)
+    INSERT INTO article (url, title, publication, summary, articletext, html, assets)
+    VALUES (%(url)s, %(title)s, %(publication)s, %(summary)s, %(articletext)s, %(html)s, %(assets)s)
     """, consistency_level=ConsistencyLevel.ONE)
     method_frame, header_frame, body = channel.basic_get('articles')
     if method_frame:
+        pathuuid = str(uuid.uuid4())
         channel.basic_ack(method_frame.delivery_tag)
         cluster = Cluster([ip])
         session = cluster.connect()
         session.set_keyspace(keyspace)
-        parsed = parsearticle.parsearticle(body)
-        for asset in parsed['images']:
+        try:
+            parsed = parsearticle.parsearticle(body, pathuuid)
+        except:
+            shutil.rmtree(pathuuid)
+            print('failed')
+            exit(1)
+        for asset in parsed['assets']:
             thing=chunkcass.chunkandinsertimage(session=session, filepath=asset['imgpath'], imgname=asset['imgname'], imgurl=asset['imgurl'])
-        shutil.rmtree(parsed['images'][0]['imgpath'].rsplit('/',1)[0])
-        # session.execute(article, dict(object_id=str(parsed['articleurl']), chunk_count=thing['count'], size=thing['totalsize'], chunk_size=thing['chunksize'], assets=thing['objectid'], title=parsed['imgname'], publication=parsed['publication']))
+        shutil.rmtree(pathuuid)
+        session.execute(article, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
     else:
         print('No message returned')
-    articlequeue.get()
-    # image = session.execute("SELECT object_id, chunk_count FROM image where image_url=\'"+parsed['imgurl']+"\'")[0]
+    # articlequeue.get()
