@@ -59,6 +59,7 @@ def get(ip, keyspace):
             parsed = parsearticle.parsearticle(body, pathuuid)
         except:
             shutil.rmtree(pathuuid)
+            articlequeue.get()
             print('failed')
             exit(1)
         for asset in parsed['assets']:
@@ -67,4 +68,4 @@ def get(ip, keyspace):
         session.execute(article, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
     else:
         print('No message returned')
-    # articlequeue.get()
+    articlequeue.get()
