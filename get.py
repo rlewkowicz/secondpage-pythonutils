@@ -63,9 +63,10 @@ def get(ip, keyspace):
             print('failed')
             exit(1)
         for asset in parsed['assets']:
-            thing=chunkcass.chunkandinsertimage(session=session, filepath=asset['imgpath'], imgname=asset['imgname'], imgurl=asset['imgurl'])
+            thing=chunkcass.chunkandinsertimage(session=session, filepath=asset['imgpath'], imgname=asset['imgname'], imgurl=asset['imgurl'], content_type=asset['content_type'])
         shutil.rmtree(pathuuid)
         session.execute(article, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
     else:
-        print('No message returned')
+        pass
+        # print('No message returned')
     articlequeue.get()

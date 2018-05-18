@@ -32,7 +32,7 @@ def initimage(session):
         CREATE INDEX IF NOT EXISTS ON blob_chunk(chunk_id);
     """)
 
-def chunkandinsertimage(session, filepath, imgurl, imgname, chunksize = 2**16, threads = 2):
+def chunkandinsertimage(session, filepath, imgurl, imgname, content_type, chunksize = 2**16, threads = 2):
 
     blob_chunk = SimpleStatement("""
     INSERT INTO blob_chunk (object_id, chunk_id, chunk_size, data)
@@ -41,8 +41,8 @@ def chunkandinsertimage(session, filepath, imgurl, imgname, chunksize = 2**16, t
     """, consistency_level=ConsistencyLevel.ONE)
 
     image = SimpleStatement("""
-    INSERT INTO image (object_id, chunk_count, size, name, checksum, image_url, metadata)
-    VALUES (%(object_id)s, %(chunk_count)s, %(size)s, %(name)s, %(checksum)s, %(image_url)s, %(metadata)s)
+    INSERT INTO image (object_id, chunk_count, size, name, checksum, image_url, metadata, content_type)
+    VALUES (%(object_id)s, %(chunk_count)s, %(size)s, %(name)s, %(checksum)s, %(image_url)s, %(metadata)s, %(content_type)s)
     IF NOT EXISTS
     """, consistency_level=ConsistencyLevel.ONE)
 
@@ -70,8 +70,8 @@ def chunkandinsertimage(session, filepath, imgurl, imgname, chunksize = 2**16, t
             chunk = source.read(chunksize)
         if hashid.hexdigest() != checksum.hexdigest():
             raise ValueError('The final object checksum for the chunked object does not match the original hash')
-            
-    session.execute(image, dict(object_id=hashid.hexdigest(), chunk_count=count, size=totalsize, name=imgname, checksum=hashid.hexdigest(), image_url=imgurl, metadata="null"))
+
+    session.execute(image, dict(object_id=hashid.hexdigest(), chunk_count=count, size=totalsize, name=imgname, checksum=hashid.hexdigest(), image_url=imgurl, metadata="null", content_type=content_type))
 
     thing = {}
     thing['objectid'] = hashid.hexdigest()

@@ -40,6 +40,7 @@ def initarticle(ip, keyspace):
             checksum text,
             image_url text,
             metadata text,
+            content_type text,
             PRIMARY KEY (image_url)
         )
     """)

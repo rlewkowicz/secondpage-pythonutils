@@ -8,6 +8,8 @@ from metadata_parser import MetadataParser
 import uuid
 import os
 from bs4 import BeautifulSoup
+from gensim.summarization import summarize
+
 
 
 def getimages(articletext, images, pathuuid):
@@ -17,13 +19,18 @@ def getimages(articletext, images, pathuuid):
             if x.get('src') is not None:
                 image = {}
                 imgurl = x.get('src')
+                print(imgurl)
+                if not imgurl.startswith("http"):
+                    imgurl = 'https:'+imgurl
+                    print(imgurl)
                 imgurlclean = imgurl.rsplit('?', 1)[0]
                 imgname = imgurlclean.rsplit('/', 1)[-1]
                 imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
-                urllib.request.urlretrieve(imgurl, imgpath)
+                geturl = urllib.request.urlretrieve(imgurl, imgpath)
                 image['imgurl'] = imgurl
                 image['imgname'] = imgname
                 image['imgpath'] = imgpath
+                image['content_type'] = geturl[1]['Content-Type']
                 images.append(image)
         except:
             pass
@@ -36,6 +43,8 @@ def parsearticle(article, pathuuid):
     req  = requests.get("http://localhost:3000/render/"+urllib.parse.quote_plus(json.loads(article.decode('utf-8'))["link"]))
     articletext = MetadataParser(html=req.text)
     imgurl = str(articletext.get_metadata('image'))
+    if not imgurl.startswith("http"):
+        imgurl = 'http:'+imgurl
     imgurlnopost = imgurl.rsplit('?', 1)[0]
     imgname = imgurlnopost.rsplit('/', 1)[-1]
     imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
@@ -65,13 +74,14 @@ def parsearticle(article, pathuuid):
     mainimage['imgurl'] = imgurl
     mainimage['imgname'] = imgname
     mainimage['imgpath'] = imgpath
+    mainimage['content_type'] = geturl[1]['Content-Type']
     images.append(mainimage)
     images1 = getimages(req.text, images, pathuuid)
     articletext = fulltext(req.text)
     thing = {}
     thing['title'] = json.loads(article.decode('utf-8'))["title"]
     thing['articletext'] = articletext
-    thing['summary'] = articletext
+    thing['summary'] = summarize(articletext)
     thing['assets'] = images1
     thing['publication'] = publication
     thing['articleurl'] = articleurl
