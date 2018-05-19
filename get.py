@@ -26,7 +26,6 @@ from cassandra.query import SimpleStatement
 
 import chunkcass
 import parsearticle
-from joblib import Parallel, delayed
 import shutil
 
 
