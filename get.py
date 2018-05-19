@@ -1,8 +1,4 @@
-from __future__ import division
-from newspaper import fulltext
-from newspaper import Article
 import base64
-import requests
 import json
 import pika
 import urllib.parse
