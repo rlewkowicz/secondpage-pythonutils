@@ -11,13 +11,7 @@ import logging
 import hashlib
 import uuid
 
-
-from metadata_parser import MetadataParser
-import pdb
-import pprint
 import warnings
-from bs4 import BeautifulSoup
-import queue
 warnings.filterwarnings("ignore")
 
 log = logging.getLogger()
