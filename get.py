@@ -30,7 +30,7 @@ import shutil
 
 
 def get(ip, keyspace):
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(os.getenv("RABBIT_HOST")))
     channel = connection.channel()
     channel.queue_declare(queue='articles')
     article = SimpleStatement("""

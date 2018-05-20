@@ -11,7 +11,6 @@ from bs4 import BeautifulSoup
 from gensim.summarization import summarize
 
 
-
 def getimages(articletext, images, pathuuid):
     soup = BeautifulSoup(articletext)
     for x in soup.findAll(True):

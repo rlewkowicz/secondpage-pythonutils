@@ -5,3 +5,5 @@ pika
 requests
 uuid
 newspaper3k
+gensim
+dotenv
