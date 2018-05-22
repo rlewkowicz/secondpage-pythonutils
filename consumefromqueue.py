@@ -1,6 +1,9 @@
 import multiprocessing
 import initcass
 import get
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+import os
 
 def get_init(q):
     get.articlequeue = q

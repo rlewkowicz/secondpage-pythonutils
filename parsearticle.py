@@ -9,6 +9,8 @@ import uuid
 import os
 from bs4 import BeautifulSoup
 from gensim.summarization import summarize
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 
 
 def getimages(articletext, images, pathuuid):
@@ -39,7 +41,7 @@ def getimages(articletext, images, pathuuid):
 def parsearticle(article, pathuuid):
     mainimage={}
     images = []
-    req  = requests.get("http://localhost:3000/render/"+urllib.parse.quote_plus(json.loads(article.decode('utf-8'))["link"]))
+    req  = requests.get("http://"+os.getenv("RENDER_HOST")+":3000/render/"+urllib.parse.quote_plus(json.loads(article.decode('utf-8'))["link"]))
     articletext = MetadataParser(html=req.text)
     imgurl = str(articletext.get_metadata('image'))
     if not imgurl.startswith("http"):
@@ -58,7 +60,7 @@ def parsearticle(article, pathuuid):
     except:
         pass
     while not geturl:
-        req  = requests.get("http://localhost:3000/render/"+urllib.parse.quote_plus(json.loads(article.decode('utf-8'))["link"]))
+        req  = requests.get("http://"+os.getenv("RENDER_HOST")+":3000/render/"+urllib.parse.quote_plus(json.loads(article.decode('utf-8'))["link"]))
         articletext = MetadataParser(html=req.text)
         imgurl = str(articletext.get_metadata('image'))
         imgurlnopost = imgurl.rsplit('?', 1)[0]

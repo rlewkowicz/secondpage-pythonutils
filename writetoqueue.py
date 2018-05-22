@@ -3,8 +3,8 @@ import json
 import base64
 import pika
 import os
-from dotenv import load_dotenv
-load_dotenv()
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 
 r = requests.get('http://'+os.getenv("CONSUL_HOST")+':8500/v1/kv/categories', verify=False)
 data  = base64.b64decode(json.loads(r.text)[0]['Value'])

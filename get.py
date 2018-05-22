@@ -3,6 +3,8 @@ import json
 import pika
 import urllib.parse
 import urllib.request
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 
 import os
 import multiprocessing
