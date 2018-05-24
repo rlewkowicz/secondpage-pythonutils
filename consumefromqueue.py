@@ -7,13 +7,15 @@ import os
 
 def get_init(q):
     get.articlequeue = q
+if os.getenv("ENV") == "dev":
+    initcass.initarticle(os.getenv("CASSANDRA_HOST"), os.getenv("CASSANDRA_KEYSPACE"))
 
-initcass.initarticle(os.getenv("CASSANDRA_HOST"), os.getenv("CASSANDRA_KEYSPACE"))
-articlequeue=multiprocessing.Queue(maxsize=15)
+
+articlequeue=multiprocessing.Queue(maxsize=5)
 pool = multiprocessing.Pool(initializer=get_init, initargs=[articlequeue])
 
 def main():
-    # get.get('127.0.0.1', 'yourmom')
+    # get.get(os.getenv("CASSANDRA_HOST"), os.getenv("CASSANDRA_KEYSPACE"))
     while True:
         if not articlequeue.full():
             articlequeue.put_nowait(1)
