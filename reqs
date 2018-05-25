@@ -6,4 +6,4 @@ requests
 uuid
 newspaper3k
 gensim
-dotenv
+python-dotenv

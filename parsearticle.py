@@ -13,17 +13,13 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 
-def getimages(articletext, images, pathuuid):
-    soup = BeautifulSoup(articletext)
-    for x in soup.findAll(True):
+def getimages(resources, images, pathuuid):
+    for resource in resources:
         try:
-            if x.get('src') is not None:
-                image = {}
-                imgurl = x.get('src')
-                print(imgurl)
-                if not imgurl.startswith("http"):
-                    imgurl = 'https:'+imgurl
-                    print(imgurl)
+            image = {}
+            imgurl = resource['url']
+            print(imgurl)
+            if imgurl.startswith("http"):
                 imgurlclean = imgurl.rsplit('?', 1)[0]
                 imgname = imgurlclean.rsplit('/', 1)[-1]
                 imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
@@ -42,7 +38,7 @@ def parsearticle(article, pathuuid):
     mainimage={}
     images = []
     req  = requests.get("http://"+os.getenv("RENDER_HOST")+":3000/render/"+urllib.parse.quote_plus(json.loads(article.decode('utf-8'))["link"]))
-    articletext = MetadataParser(html=req.text)
+    articletext = MetadataParser(html=json.loads(req.text)['html'])
     imgurl = str(articletext.get_metadata('image'))
     if not imgurl.startswith("http"):
         imgurl = 'http:'+imgurl
@@ -61,7 +57,7 @@ def parsearticle(article, pathuuid):
         pass
     while not geturl:
         req  = requests.get("http://"+os.getenv("RENDER_HOST")+":3000/render/"+urllib.parse.quote_plus(json.loads(article.decode('utf-8'))["link"]))
-        articletext = MetadataParser(html=req.text)
+        articletext = MetadataParser(html=json.loads(req.text)['html'])
         imgurl = str(articletext.get_metadata('image'))
         imgurlnopost = imgurl.rsplit('?', 1)[0]
         imgname = imgurlnopost.rsplit('/', 1)[-1]
@@ -77,8 +73,8 @@ def parsearticle(article, pathuuid):
     mainimage['imgpath'] = imgpath
     mainimage['content_type'] = geturl[1]['Content-Type']
     images.append(mainimage)
-    images1 = getimages(req.text, images, pathuuid)
-    articletext = fulltext(req.text)
+    images1 = getimages(json.loads(req.text)['tree']['frameTree']['resources'], images, pathuuid)
+    articletext = fulltext(json.loads(req.text)['html'])
     thing = {}
     thing['title'] = json.loads(article.decode('utf-8'))["title"]
     thing['articletext'] = articletext
@@ -86,6 +82,6 @@ def parsearticle(article, pathuuid):
     thing['assets'] = images1
     thing['publication'] = publication
     thing['articleurl'] = articleurl
-    thing['html'] = req.text
+    thing['html'] = json.loads(req.text)['html']
 
     return thing
