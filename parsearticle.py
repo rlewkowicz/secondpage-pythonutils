@@ -13,12 +13,66 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 
-def getimages(resources, images, pathuuid):
+def getimages(html, resources, images, pathuuid):
+    soup = BeautifulSoup(html)
+    for x in soup.findAll(True):
+        try:
+            if x.get('srcset') is not None:
+                srcset = x.get('srcset')
+                srcset = srcset.rsplit(',')
+                for imgurl in srcset:
+                    image = {}
+                    if imgurl.startswith(" "):
+                        imgurl = imgurl[1:]
+                    imgurl = imgurl.rsplit(' ', 1)[0]
+                    print(imgurl)
+                    imgurlclean = imgurl.rsplit('?', 1)[0]
+                    imgname = imgurlclean.rsplit('/', 1)[-1]
+                    imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
+                    geturl = urllib.request.urlretrieve(imgurl, imgpath)
+                    image['imgurl'] = imgurl
+                    image['imgname'] = imgname
+                    image['imgpath'] = imgpath
+                    image['content_type'] = geturl[1]['Content-Type']
+                    images.append(image)
+            if x.get('src') is not None:
+                image = {}
+                imgurl = x.get('src')
+                print(imgurl)
+                if not imgurl.startswith("http"):
+                    imgurl = 'https:'+imgurl
+                    print(imgurl)
+                imgurlclean = imgurl.rsplit('?', 1)[0]
+                imgname = imgurlclean.rsplit('/', 1)[-1]
+                imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
+                geturl = urllib.request.urlretrieve(imgurl, imgpath)
+                image['imgurl'] = imgurl
+                image['imgname'] = imgname
+                image['imgpath'] = imgpath
+                image['content_type'] = geturl[1]['Content-Type']
+                images.append(image)
+            if x.get('itemid') is not None:
+                image = {}
+                imgurl = x.get('itemid')
+                print(imgurl)
+                if not imgurl.startswith("http"):
+                    imgurl = 'https:'+imgurl
+                    print(imgurl)
+                imgurlclean = imgurl.rsplit('?', 1)[0]
+                imgname = imgurlclean.rsplit('/', 1)[-1]
+                imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
+                geturl = urllib.request.urlretrieve(imgurl, imgpath)
+                image['imgurl'] = imgurl
+                image['imgname'] = imgname
+                image['imgpath'] = imgpath
+                image['content_type'] = geturl[1]['Content-Type']
+                images.append(image)
+        except:
+            pass
     for resource in resources:
         try:
             image = {}
             imgurl = resource['url']
-            print(imgurl)
             if imgurl.startswith("http"):
                 imgurlclean = imgurl.rsplit('?', 1)[0]
                 imgname = imgurlclean.rsplit('/', 1)[-1]
@@ -46,6 +100,7 @@ def parsearticle(article, pathuuid):
     imgname = imgurlnopost.rsplit('/', 1)[-1]
     imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
     publication = json.loads(article.decode('utf-8'))["publication"]
+    category = json.loads(article.decode('utf-8'))["category"]
     title = json.loads(article.decode('utf-8'))["title"]
     articleurl = json.loads(article.decode('utf-8'))["link"]
     geturl = None
@@ -73,7 +128,7 @@ def parsearticle(article, pathuuid):
     mainimage['imgpath'] = imgpath
     mainimage['content_type'] = geturl[1]['Content-Type']
     images.append(mainimage)
-    images1 = getimages(json.loads(req.text)['tree']['frameTree']['resources'], images, pathuuid)
+    images1 = getimages(json.loads(req.text)['html'], json.loads(req.text)['tree']['frameTree']['resources'], images, pathuuid)
     articletext = fulltext(json.loads(req.text)['html'])
     thing = {}
     thing['title'] = json.loads(article.decode('utf-8'))["title"]
@@ -81,6 +136,7 @@ def parsearticle(article, pathuuid):
     thing['summary'] = summarize(articletext)
     thing['assets'] = images1
     thing['publication'] = publication
+    thing['category'] = category
     thing['articleurl'] = articleurl
     thing['html'] = json.loads(req.text)['html']
 

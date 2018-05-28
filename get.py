@@ -36,8 +36,8 @@ def get(ip, keyspace):
     channel = connection.channel()
     channel.queue_declare(queue='articles')
     article = SimpleStatement("""
-    INSERT INTO article (url, title, publication, summary, articletext, html, assets)
-    VALUES (%(url)s, %(title)s, %(publication)s, %(summary)s, %(articletext)s, %(html)s, %(assets)s)
+    INSERT INTO article (url, timeuuid, category, title, publication, summary, articletext, html, assets)
+    VALUES (%(url)s, now(), %(category)s, %(title)s, %(publication)s, %(summary)s, %(articletext)s, %(html)s, %(assets)s)
     """, consistency_level=ConsistencyLevel.ONE)
     method_frame, header_frame, body = channel.basic_get('articles')
     if method_frame:
@@ -53,10 +53,16 @@ def get(ip, keyspace):
             articlequeue.get()
             print('failed')
             exit(1)
-        for asset in parsed['assets']:
-            thing=chunkcass.chunkandinsertimage(session=session, filepath=asset['imgpath'], imgname=asset['imgname'], imgurl=asset['imgurl'], content_type=asset['content_type'])
-        shutil.rmtree(pathuuid)
-        session.execute(article, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
+        try:
+            for asset in parsed['assets']:
+                thing=chunkcass.chunkandinsertimage(session=session, filepath=asset['imgpath'], imgname=asset['imgname'], imgurl=asset['imgurl'], content_type=asset['content_type'])
+            shutil.rmtree(pathuuid)
+            session.execute(article, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], category=parsed['category'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
+        except:
+            shutil.rmtree(pathuuid)
+            articlequeue.get()
+            print('failed')
+            exit(1)
     else:
         pass
         # print('No message returned')

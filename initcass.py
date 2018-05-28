@@ -17,19 +17,24 @@ def initarticle(ip, keyspace):
 
     session.set_keyspace(keyspace)
 
-
     session.execute("""
         CREATE TABLE IF NOT EXISTS article (
             url text,
+            timeuuid timeuuid,
+            category text,
             title text,
             publication text,
             summary text,
             articletext text,
             html text,
             assets text,
-            PRIMARY KEY (url)
-        )
+            PRIMARY KEY (url, timeuuid)
+        ) WITH CLUSTERING ORDER BY (timeuuid DESC)
         """)
+
+    session.execute("""
+        CREATE INDEX IF NOT EXISTS ON article(category);
+    """)
 
     session.execute("""
         CREATE TABLE IF NOT EXISTS image (
@@ -52,7 +57,7 @@ def initarticle(ip, keyspace):
             chunk_size int,
             data blob,
             PRIMARY KEY (object_id, chunk_id)
-        )
+        ) WITH CLUSTERING ORDER BY (chunk_id DESC)
     """)
 
     session.execute("""
