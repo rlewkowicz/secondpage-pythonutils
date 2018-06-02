@@ -10,7 +10,6 @@ def get_init(q):
 if os.getenv("ENV") == "dev":
     initcass.initarticle(os.getenv("CASSANDRA_HOST"), os.getenv("CASSANDRA_KEYSPACE"))
 
-
 articlequeue=multiprocessing.Queue(maxsize=int(os.getenv("QUEUE_SIZE")))
 pool = multiprocessing.Pool(initializer=get_init, initargs=[articlequeue])
 

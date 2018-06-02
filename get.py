@@ -42,22 +42,28 @@ def get(ip, keyspace):
     method_frame, header_frame, body = channel.basic_get('articles')
     if method_frame:
         pathuuid = str(uuid.uuid4())
-        channel.basic_ack(method_frame.delivery_tag)
-        cluster = Cluster([ip])
-        session = cluster.connect()
-        session.set_keyspace(keyspace)
         try:
-            parsed = parsearticle.parsearticle(body, pathuuid)
-        except:
-            shutil.rmtree(pathuuid)
-            articlequeue.get()
-            print('failed')
-            exit(1)
-        try:
-            for asset in parsed['assets']:
-                thing=chunkcass.chunkandinsertimage(session=session, filepath=asset['imgpath'], imgname=asset['imgname'], imgurl=asset['imgurl'], content_type=asset['content_type'])
-            shutil.rmtree(pathuuid)
-            session.execute(article, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], category=parsed['category'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
+            channel.basic_ack(method_frame.delivery_tag)
+            cluster = Cluster([ip])
+            session = cluster.connect()
+            session.set_keyspace(keyspace)
+            try:
+                parsed = parsearticle.parsearticle(body, pathuuid)
+            except:
+                shutil.rmtree(pathuuid)
+                articlequeue.get()
+                print('failed')
+                exit(1)
+            try:
+                for asset in parsed['assets']:
+                    thing=chunkcass.chunkandinsertimage(session=session, filepath=asset['imgpath'], imgname=asset['imgname'], imgurl=asset['imgurl'], content_type=asset['content_type'])
+                shutil.rmtree(pathuuid)
+                session.execute(article, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], category=parsed['category'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
+            except:
+                shutil.rmtree(pathuuid)
+                articlequeue.get()
+                print('failed')
+                exit(1)
         except:
             shutil.rmtree(pathuuid)
             articlequeue.get()

@@ -9,9 +9,11 @@ import uuid
 import os
 from bs4 import BeautifulSoup
 from gensim.summarization import summarize
+import time
+import timeout_decorator
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
-
+from bs4.element import Comment
 
 def getimages(html, resources, images, pathuuid):
     soup = BeautifulSoup(html)
@@ -25,7 +27,6 @@ def getimages(html, resources, images, pathuuid):
                     if imgurl.startswith(" "):
                         imgurl = imgurl[1:]
                     imgurl = imgurl.rsplit(' ', 1)[0]
-                    print(imgurl)
                     imgurlclean = imgurl.rsplit('?', 1)[0]
                     imgname = imgurlclean.rsplit('/', 1)[-1]
                     imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
@@ -38,10 +39,8 @@ def getimages(html, resources, images, pathuuid):
             if x.get('src') is not None:
                 image = {}
                 imgurl = x.get('src')
-                print(imgurl)
                 if not imgurl.startswith("http"):
                     imgurl = 'https:'+imgurl
-                    print(imgurl)
                 imgurlclean = imgurl.rsplit('?', 1)[0]
                 imgname = imgurlclean.rsplit('/', 1)[-1]
                 imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
@@ -54,10 +53,8 @@ def getimages(html, resources, images, pathuuid):
             if x.get('itemid') is not None:
                 image = {}
                 imgurl = x.get('itemid')
-                print(imgurl)
                 if not imgurl.startswith("http"):
                     imgurl = 'https:'+imgurl
-                    print(imgurl)
                 imgurlclean = imgurl.rsplit('?', 1)[0]
                 imgname = imgurlclean.rsplit('/', 1)[-1]
                 imgpath = pathuuid+'/'+imgname+str(uuid.uuid4())
@@ -87,11 +84,12 @@ def getimages(html, resources, images, pathuuid):
             pass
     return images
 
-
+@timeout_decorator.timeout(500)
 def parsearticle(article, pathuuid):
     mainimage={}
     images = []
     req  = requests.get("http://"+os.getenv("RENDER_HOST")+":3000/render/"+urllib.parse.quote_plus(json.loads(article.decode('utf-8'))["link"]))
+    print("http://"+os.getenv("RENDER_HOST")+":3000/render/"+urllib.parse.quote_plus(json.loads(article.decode('utf-8'))["link"]))
     articletext = MetadataParser(html=json.loads(req.text)['html'])
     imgurl = str(articletext.get_metadata('image'))
     if not imgurl.startswith("http"):
@@ -129,7 +127,10 @@ def parsearticle(article, pathuuid):
     mainimage['content_type'] = geturl[1]['Content-Type']
     images.append(mainimage)
     images1 = getimages(json.loads(req.text)['html'], json.loads(req.text)['tree']['frameTree']['resources'], images, pathuuid)
-    articletext = fulltext(json.loads(req.text)['html'])
+    try:
+        articletext = fulltext(json.loads(req.text)['html'], language='en')
+    except:
+        articletext = ""
     thing = {}
     thing['title'] = json.loads(article.decode('utf-8'))["title"]
     thing['articletext'] = articletext
