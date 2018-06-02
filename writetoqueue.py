@@ -20,8 +20,13 @@ channel = connection.channel()
 channel.queue_declare(queue='articles')
 
 for key in categories:
+    print(key)
     r = requests.get(os.getenv("RSS_URL_WITH_TRAILING_SLASH")+key,verify=False)
-    feeds[key]=json.loads(r.text)
+    print(r.text)
+    try:
+        feeds[key]=json.loads(r.text)
+    except:
+        pass
 
 for category in categories:
     publications=feeds[category]["publications"]
