@@ -32,11 +32,18 @@ import shutil
 
 
 def get(ip, keyspace):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(os.getenv("RABBIT_HOST")))
     channel = connection.channel()
     channel.queue_declare(queue='articles')
     article = SimpleStatement("""
     INSERT INTO article (url, timeuuid, category, title, publication, summary, articletext, html, assets)
+    VALUES (%(url)s, now(), %(category)s, %(title)s, %(publication)s, %(summary)s, %(articletext)s, %(html)s, %(assets)s)
+    """, consistency_level=ConsistencyLevel.ONE)
+    article_category = SimpleStatement("""
+    INSERT INTO article_category (url, timeuuid, category, title, publication, summary, articletext, html, assets)
+    VALUES (%(url)s, now(), %(category)s, %(title)s, %(publication)s, %(summary)s, %(articletext)s, %(html)s, %(assets)s)
+    """, consistency_level=ConsistencyLevel.ONE)
+    article_publication = SimpleStatement("""
+    INSERT INTO article_publication (url, timeuuid, category, title, publication, summary, articletext, html, assets)
     VALUES (%(url)s, now(), %(category)s, %(title)s, %(publication)s, %(summary)s, %(articletext)s, %(html)s, %(assets)s)
     """, consistency_level=ConsistencyLevel.ONE)
     method_frame, header_frame, body = channel.basic_get('articles')
@@ -59,6 +66,9 @@ def get(ip, keyspace):
                     thing=chunkcass.chunkandinsertimage(session=session, filepath=asset['imgpath'], imgname=asset['imgname'], imgurl=asset['imgurl'], content_type=asset['content_type'])
                 shutil.rmtree(pathuuid)
                 session.execute(article, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], category=parsed['category'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
+                session.execute(article_category, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], category=parsed['category'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
+                session.execute(article_publication, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], category=parsed['category'], summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
+
             except:
                 shutil.rmtree(pathuuid)
                 articlequeue.get()
@@ -72,4 +82,7 @@ def get(ip, keyspace):
     else:
         pass
         # print('No message returned')
-    articlequeue.get()
+    try:
+        articlequeue.get()
+    except:
+        pass

@@ -33,7 +33,40 @@ def initarticle(ip, keyspace):
         """)
 
     session.execute("""
-        CREATE INDEX IF NOT EXISTS ON article(category);
+        CREATE TABLE IF NOT EXISTS article_category (
+            url text,
+            timeuuid timeuuid,
+            category text,
+            title text,
+            publication text,
+            summary text,
+            articletext text,
+            html text,
+            assets text,
+            PRIMARY KEY (url, timeuuid)
+        ) WITH CLUSTERING ORDER BY (timeuuid DESC)
+        """)
+
+    session.execute("""
+        CREATE TABLE IF NOT EXISTS article_publication (
+            url text,
+            timeuuid timeuuid,
+            category text,
+            title text,
+            publication text,
+            summary text,
+            articletext text,
+            html text,
+            assets text,
+            PRIMARY KEY (url, timeuuid)
+        ) WITH CLUSTERING ORDER BY (timeuuid DESC)
+        """)
+
+    session.execute("""
+        CREATE INDEX IF NOT EXISTS ON article_category(category);
+    """)
+    session.execute("""
+        CREATE INDEX IF NOT EXISTS ON article_publication(publication);
     """)
 
     session.execute("""
