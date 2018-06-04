@@ -32,6 +32,7 @@ import shutil
 
 
 def get(ip, keyspace):
+    connection = pika.BlockingConnection(pika.ConnectionParameters(os.getenv("RABBIT_HOST"), heartbeat=5, socket_timeout=1, blocked_connection_timeout=1))
     channel = connection.channel()
     channel.queue_declare(queue='articles')
     article = SimpleStatement("""
@@ -80,7 +81,7 @@ def get(ip, keyspace):
             print('failed')
             exit(1)
     else:
-        pass
+        connection.close()
         # print('No message returned')
     try:
         articlequeue.get()
