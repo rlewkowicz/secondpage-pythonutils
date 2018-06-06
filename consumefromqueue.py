@@ -8,7 +8,7 @@ import pika
 
 
 def get_init(q):
-    get.articlequeue = q    
+    get.articlequeue = q
 
 if os.getenv("ENV") == "dev":
     initcass.initarticle(os.getenv("CASSANDRA_HOST"), os.getenv("CASSANDRA_KEYSPACE"))
