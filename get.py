@@ -29,6 +29,8 @@ from cassandra.query import SimpleStatement
 import chunkcass
 import parsearticle
 import shutil
+from time import sleep
+
 
 
 def get(ip, keyspace):
@@ -82,6 +84,7 @@ def get(ip, keyspace):
             exit(1)
     else:
         connection.close()
+        sleep(5)
         # print('No message returned')
     try:
         articlequeue.get()
