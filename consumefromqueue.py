@@ -19,8 +19,9 @@ pool = multiprocessing.Pool(initializer=get_init, initargs=[articlequeue])
 def main():
     # get.get(os.getenv("CASSANDRA_HOST"), os.getenv("CASSANDRA_KEYSPACE"))
     while True:
-        if not articlequeue.full():
-            articlequeue.put_nowait(1)
-            pool.apply_async(get.get,  kwds={'ip':os.getenv("CASSANDRA_HOST"), 'keyspace':os.getenv("CASSANDRA_KEYSPACE")})
+        get.get(os.getenv("CASSANDRA_HOST"), os.getenv("CASSANDRA_KEYSPACE"))
+        # if not articlequeue.full():
+        #     articlequeue.put_nowait(1)
+        #     pool.apply_async(get.get,  kwds={'ip':os.getenv("CASSANDRA_HOST"), 'keyspace':os.getenv("CASSANDRA_KEYSPACE")})
 if __name__ == "__main__":
     main()
