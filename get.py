@@ -71,18 +71,25 @@ def get(ip, keyspace):
                 session.execute(article, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], category=parsed['category'], topimage=str(parsed['assets'][0]['imgurl']), summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
                 session.execute(article_category, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], category=parsed['category'], topimage=str(parsed['assets'][0]['imgurl']), summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
                 session.execute(article_publication, dict(url=str(parsed['articleurl']), title=parsed['title'], publication=parsed['publication'], category=parsed['category'], topimage=str(parsed['assets'][0]['imgurl']), summary=parsed['summary'], articletext=parsed['articletext'], html=parsed['html'], assets=str(parsed['assets'])))
-
+                session.close()
+                cluster.close()
             except:
+                session.close()
+                cluster.close()
                 shutil.rmtree(pathuuid)
                 articlequeue.get()
                 print('failed')
                 exit(1)
         except:
+            session.close()
+            cluster.close()
             shutil.rmtree(pathuuid)
             articlequeue.get()
             print('failed')
             exit(1)
     else:
+        session.close()
+        cluster.close()
         connection.close()
         sleep(5)
         # print('No message returned')
