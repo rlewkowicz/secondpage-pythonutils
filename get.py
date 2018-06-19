@@ -91,7 +91,7 @@ def get(ip, keyspace):
         session.close()
         cluster.close()
         connection.close()
-        sleep(5)
+        sleep(60)
         # print('No message returned')
     try:
         articlequeue.get()

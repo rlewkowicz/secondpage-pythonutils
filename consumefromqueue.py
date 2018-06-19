@@ -5,6 +5,7 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 import os
 import pika
+from time import sleep
 
 
 def get_init(q):
@@ -21,6 +22,7 @@ def main():
     while True:
         try:
             get.get(os.getenv("CASSANDRA_HOST"), os.getenv("CASSANDRA_KEYSPACE"))
+            sleep(5)
         except:
             pass
         # if not articlequeue.full():
